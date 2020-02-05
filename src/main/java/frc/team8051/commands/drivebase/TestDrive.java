@@ -11,9 +11,9 @@ public class TestDrive extends Command {
     public TestDrive(OI oi, DifferentialDrive differentialDrive) {
         this.oi = oi;
         this.differentialDrive = differentialDrive;
-        System.out.println("instantiating <TestDrive>");
-        System.out.println("<TestDrive> oi " + oi == null);
-        System.out.println("<TestDrive> differentialDrive " + differentialDrive == null);
+//        System.out.println("instantiating <TestDrive>");
+//        System.out.println("<TestDrive> oi " + oi == null);
+//        System.out.println("<TestDrive> differentialDrive " + differentialDrive == null);
     }
 
     public TestDrive() {
