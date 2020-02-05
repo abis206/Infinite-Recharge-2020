@@ -67,6 +67,7 @@ public class Robot extends TimedRobot {
 //    System.out.println("encoder left " + drivebaseEncoder.getLeftSensorReading() +
 //                    " encoder right " + drivebaseEncoder.getRightSensorReading());
     Scheduler.getInstance().run();
+    System.out.println("remove this");
   }
 
   @Override
