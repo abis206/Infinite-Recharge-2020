@@ -6,16 +6,20 @@
 /*----------------------------------------------------------------------------*/
 package frc.team8051;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.team8051.commands.drivebase.TestDrive;
+import frc.team8051.commands.drivebase.RotateDrivebase;
 import frc.team8051.sensors.DrivebaseEncoder;
 import frc.team8051.sensors.Gyro;
 import frc.team8051.subsystems.DifferentialDriveBase;
 import frc.team8051.subsystems.Drivebase;
 import frc.team8051.services.OI;
+
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;;
 import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
   private static Robot robot;
@@ -39,27 +43,38 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     oi.initializeBind();
-   testDrive = new TestDrive();
-  }
+    testDrive = new TestDrive();
 
+    SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
+    SmartDashboard.putData("Analog Gyro", gyro);
+    SmartDashboard.putBoolean("Reset Gyro", false);
+  }
+  
   @Override
   public void robotPeriodic() {
-
-    Scheduler.getInstance().run();
+    // for tuning the pid rotatedrivebase command
+    if(SmartDashboard.getBoolean("Reset Gyro", false)) {
+      gyro.reset();
+      SmartDashboard.putBoolean("Reset Gyro", false);
+    }
+    SmartDashboard.putNumber("Current Heading", gyro.getAngle());
+    // System.out.println("gryo angle: " + gyro.getAngle());
   }
 
   @Override
   public void autonomousInit() {
+
   }
 
   @Override
   public void autonomousPeriodic() {
+
   }
 
   @Override
   public void teleopInit() {
     System.out.println("Running teleopInit()");
-    Scheduler.getInstance().add(testDrive);
+    // Scheduler.getInstance().add(testDrive);
   }
 
   @Override
@@ -67,7 +82,6 @@ public class Robot extends TimedRobot {
 //    System.out.println("encoder left " + drivebaseEncoder.getLeftSensorReading() +
 //                    " encoder right " + drivebaseEncoder.getRightSensorReading());
     Scheduler.getInstance().run();
-    System.out.println("remove this");
   }
 
   @Override
