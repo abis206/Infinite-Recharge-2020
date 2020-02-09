@@ -5,4 +5,8 @@ public class Gyro extends  ADXRS450_Gyro {
     public Gyro() {
 
     }
+
+    public double getHeading() {
+        return -getAngle();
+    }
 }

@@ -1,8 +1,11 @@
 package frc.team8051.commands.drivebase;
-import edu.wpi.first.wpilibj.PIDController;
+
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.PIDCommand;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
+
 import frc.team8051.Robot;
 import frc.team8051.sensors.Gyro;
 
@@ -11,6 +14,10 @@ public class RotateDrivebase extends PIDCommand {
     private DifferentialDrive drivebase;
     private double desiredAngle;
     private Gyro gyro;
+    private boolean waitFinished;
+    private double lastTime;
+    private double waitDuration = .350; //seconds 
+
     public RotateDrivebase(DifferentialDrive drivebase, Gyro gyro, double angle) {
         super(0.05, 0, 0.1);
 
@@ -29,37 +36,44 @@ public class RotateDrivebase extends PIDCommand {
 
     @Override
     protected void initialize() {
+        lastTime = 0;
+        waitFinished = false;
+
         gyro.reset();
-        
-        getPIDController().setPIDSourceType(PIDSourceType.kDisplacement);
-        getPIDController().setInputRange(-360, 360);
+        getPIDController().setInputRange(-180, 180);
         getPIDController().setOutputRange(-1, 1);
         getPIDController().setSetpoint(desiredAngle);
-        getPIDController().setAbsoluteTolerance(2);
+        getPIDController().setAbsoluteTolerance(3);
         getPIDController().setContinuous(true);
     }
 
 
     @Override
     protected double returnPIDInput() {
-        // what if gyro reads beyond 180 ? or 360 ?
-        
-        // System.out.println("<RotateDrivebase> gyro pid value " + gyroValue);
-        // System.out.println("<RotateDrivebase> gyro angle value" + gyro.getAngle());
-        // System.out.println("<RotateDrivebase> set point value " + getPIDController().getSetpoint());
-        
-        return gyro.pidGet();
+        double pidInput = gyro.getHeading();
+        // SmartDashboard.putNumber("PID Input", pidInput);
+        return pidInput;
     }
 
     @Override
     protected void usePIDOutput(double output) {
         // System.out.println("<RotateDrivebase> pid output " + output);
-         drivebase.tankDrive(output, -output);
+        // SmartDashboard.putNumber("PID Output", output);
+        drivebase.tankDrive(-output, output);
     }
 
     @Override
     protected boolean isFinished() {
-        return getPIDController().onTarget();
+    
+        if(getPIDController().onTarget() && !waitFinished) {
+            waitFinished = true;
+            lastTime = 	Timer.getFPGATimestamp();
+        }
+
+        if(waitFinished && (Timer.getFPGATimestamp() - lastTime) >= waitDuration) {
+            return true;
+        } 
+        return false;
     }
 
 }

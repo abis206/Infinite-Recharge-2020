@@ -27,11 +27,13 @@ public class TestDrive extends Command {
         System.out.println("<TestDrive> differentialDrive " + differentialDrive == null);
         double leftYAxis = -oi.getLeftYAxis();
         double rightYAxis = -oi.getRightYAxis();
-        double deadZone = 0.0078125;
-        if(Math.abs(leftYAxis) <= deadZone) leftYAxis = 0;
-        if(Math.abs(rightYAxis) <= deadZone) rightYAxis = 0;
+        double limit = 0.5;
+        double deadZone = 0.04;
+        leftYAxis = Math.abs(leftYAxis) <= deadZone ? 0 : leftYAxis;
+        rightYAxis = Math.abs(rightYAxis) <= deadZone ? 0 : rightYAxis;
         System.out.println("left y axis: " + leftYAxis + " right y axis: " + rightYAxis);
-        differentialDrive.tankDrive(leftYAxis, rightYAxis);
+        differentialDrive.tankDrive(leftYAxis*limit, rightYAxis*limit);
+
 //        differentialDrive.arcadeDrive(rightYAxis, leftYAxis);
     }
 

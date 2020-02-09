@@ -3,6 +3,7 @@ Code for controller
  */
 package frc.team8051.services;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.team8051.commands.drivebase.RotateDrivebase;
 import frc.team8051.constants.RobotMap;
@@ -16,6 +17,9 @@ public class OI {
 
     //declaring joystick variable
     public Joystick joystick;
+    private RotateDrivebase commandX;
+    private RotateDrivebase commandB;
+
     public OI() {
         joystick = new Joystick(0);
         //setting button variables to numbers on controller
@@ -32,9 +36,13 @@ public class OI {
     public void initializeBind() {
         //when LB button is held, we can control joysticks/movement of robot
         System.out.println("binding command to button");
-        buttonY.whenPressed(new PIDDrive(5.0f));
-        buttonA.whenPressed(new PIDDrive(-5.0f));
-        buttonX.whenPressed(new RotateDrivebase(180));
+        this.commandX = new RotateDrivebase(90);
+        this.commandB = new RotateDrivebase(-90);
+
+        buttonX.whenPressed(this.commandX);
+        buttonB.whenPressed(this.commandB);
+        SmartDashboard.putData("Button X", this.commandX);
+        SmartDashboard.putData("Button B", this.commandB);
     }
     public double getRightXAxis() { return joystick.getRawAxis(4); }
     public double getRightYAxis() {

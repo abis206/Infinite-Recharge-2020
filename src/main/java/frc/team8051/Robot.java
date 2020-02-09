@@ -16,7 +16,7 @@ import frc.team8051.services.OI;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Scheduler;;
+import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,20 +45,24 @@ public class Robot extends TimedRobot {
     oi.initializeBind();
     testDrive = new TestDrive();
 
-    SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
+
+    // SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
+
     SmartDashboard.putData("Analog Gyro", gyro);
+
     SmartDashboard.putBoolean("Reset Gyro", false);
   }
   
   @Override
   public void robotPeriodic() {
-    // for tuning the pid rotatedrivebase command
+
+    // using below lines for tuning the pid command rotatedrivebase
     if(SmartDashboard.getBoolean("Reset Gyro", false)) {
       gyro.reset();
       SmartDashboard.putBoolean("Reset Gyro", false);
     }
-    SmartDashboard.putNumber("Current Heading", gyro.getAngle());
-    // System.out.println("gryo angle: " + gyro.getAngle());
+
+    SmartDashboard.putNumber("Current Heading", gyro.getHeading());
   }
 
   @Override
@@ -82,10 +86,7 @@ public class Robot extends TimedRobot {
 //    System.out.println("encoder left " + drivebaseEncoder.getLeftSensorReading() +
 //                    " encoder right " + drivebaseEncoder.getRightSensorReading());
     Scheduler.getInstance().run();
-<<<<<<< HEAD
-=======
 //    System.out.println("remove this");
->>>>>>> 6d11176dc5464c9c3f56a127d878e013c924f1ee
   }
 
   @Override
