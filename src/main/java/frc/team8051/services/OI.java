@@ -19,6 +19,7 @@ public class OI {
     public Joystick joystick;
     private RotateDrivebase commandX;
     private RotateDrivebase commandB;
+    private PIDDrive commandY;
 
     public OI() {
         joystick = new Joystick(0);
@@ -38,12 +39,15 @@ public class OI {
         System.out.println("binding command to button");
         this.commandX = new RotateDrivebase(90);
         this.commandB = new RotateDrivebase(-90);
-
+        this.commandY = new PIDDrive();
         buttonX.whenPressed(this.commandX);
         buttonB.whenPressed(this.commandB);
+        buttonY.whenPressed(this.commandY);
         SmartDashboard.putData("Button X", this.commandX);
         SmartDashboard.putData("Button B", this.commandB);
+        SmartDashboard.putData("Button Y", this.commandY);
     }
+
     public double getRightXAxis() { return joystick.getRawAxis(4); }
     public double getRightYAxis() {
         return joystick.getRawAxis(5);

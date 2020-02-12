@@ -1,12 +1,15 @@
 package frc.team8051.sensors;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class DrivebaseEncoder {
-    private final double wheelDiameter = 6.0/12.0; // unit in feet
+public class DrivebaseEncoder implements Sendable {
+    private final double wheelDiameter = 6.0 / 12.0; // unit in feet
     private final double pulsesPerRevo = 20;
-    private final double gearRatio = 10.75;
-    private final double distancePerPulse = (wheelDiameter * Math.PI)/pulsesPerRevo/gearRatio;
+    private final double gearRatio = 10.71;
+    private final double distancePerPulse = (wheelDiameter * Math.PI) / pulsesPerRevo / gearRatio;
 
     private Encoder rightEncoder;
     private Encoder leftEncoder;
@@ -19,6 +22,9 @@ public class DrivebaseEncoder {
 
         rightEncoder.setDistancePerPulse(distancePerPulse);
         leftEncoder.setDistancePerPulse(distancePerPulse);
+
+        SmartDashboard.putData("Right Encoder", rightEncoder);
+        SmartDashboard.putData("Left Encoder", leftEncoder);
     }
 
     public double getLeftSensorReading() {
@@ -37,4 +43,10 @@ public class DrivebaseEncoder {
     public double getDistancePerPulse() {
         return distancePerPulse;
     }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+
+    }
+
 }

@@ -1,25 +1,37 @@
 package frc.team8051.commands.drivebase;
+
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.PIDCommand;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team8051.Robot;
 import frc.team8051.sensors.DrivebaseEncoder;
+import frc.team8051.sensors.Gyro;
 
 public class PIDDrive extends PIDCommand {
+    // use gyro pidcontroller to drive straight until setpoint - 1
+    // use encoder pidcontroller for remaining setpoint
     private DifferentialDrive drivebase;
     private double distance;
     private DrivebaseEncoder drivebaseEncoder;
+    private boolean waitFinished;
+    private double lastTime;
+    private double waitDuration = .350; //seconds 
+    private Gyro gyro;
+    private PIDController gyroPID;
 
     public PIDDrive(DifferentialDrive drivebase, DrivebaseEncoder drivebaseEncoder, double distance) {
-        super(0.63, 0.1, 0.0);
+        super(3.0, 0, 5);
         this.drivebase = drivebase;
         this.distance = distance;
-
+        this.gyro = Robot.getInstance().getGyro();
+        this.gyroPID = new PIDController(0, 0, 0);
         this.drivebaseEncoder = drivebaseEncoder;
-        this.drivebaseEncoder.zeroEncoder();
         setSetpoint(this.distance);
         getPIDController().setAbsoluteTolerance(0.1);
         getPIDController().setOutputRange(-1, 1);
-
+        SmartDashboard.putData("PIDDrive Gyro PID", this.gyroPID);
     }
 
     public PIDDrive(double distance) {
@@ -28,38 +40,48 @@ public class PIDDrive extends PIDCommand {
              distance);
     }
 
+    public PIDDrive() {
+        this(0);
+    }
+
     @Override
     protected void initialize() {
+        this.gyro.reset();
+        this.gyroPID.setPID(0.08, 0, 0.10);
+        this.gyroPID.setSetpoint(0);
+        this.gyroPID.enableContinuousInput(-180, 180);
+        this.gyroPID.setTolerance(3);
+
         drivebaseEncoder.zeroEncoder();
-        System.out.println("initializing PIDDrive command");
-        System.out.println("encoder left " + drivebaseEncoder.getLeftSensorReading() +
-                " encoder right " + drivebaseEncoder.getRightSensorReading());
+        this.waitFinished = false;
+        this.lastTime = 0;
     }
 
     @Override
     protected double returnPIDInput() {
-        double val = (drivebaseEncoder.getLeftSensorReading() + drivebaseEncoder.getRightSensorReading())/2;
-        System.out.println("encoder reads" + val + " set point " + getPIDController().getSetpoint());
-        return val;
+        double pidInput = (drivebaseEncoder.getLeftSensorReading() + drivebaseEncoder.getRightSensorReading())/2;
+        return pidInput;
     }
 
     @Override
     protected void usePIDOutput(double output) {
-        System.out.println("pid output " + output + " set point " + getPIDController().getSetpoint());
-        System.out.println("P: " + getPIDController().getP() + " I: " +
-                getPIDController().getI() + " D: " + getPIDController().getD());
-
-        drivebase.arcadeDrive(output, 0);
+        System.out.println("zRotation" + gyroPID.calculate(gyro.getHeading()));
+        drivebase.arcadeDrive(-Robot.getInstance().getOI().getRightYAxis(), 
+        -gyroPID.calculate(gyro.getHeading()));
     }
 
     @Override
     protected boolean isFinished() {
-        System.out.println("isFinished");
-        return getPIDController().onTarget();
+    
+        if(getPIDController().onTarget() && !waitFinished) {
+            waitFinished = true;
+            lastTime = 	Timer.getFPGATimestamp();
+        }
+
+        if(waitFinished && (Timer.getFPGATimestamp() - lastTime) >= waitDuration) {
+            return true;
+        } 
+        return false;
     }
 
-    @Override
-    protected void end() {
-
-    }
 }

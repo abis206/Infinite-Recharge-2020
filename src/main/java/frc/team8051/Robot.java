@@ -7,6 +7,7 @@
 package frc.team8051;
 
 import frc.team8051.commands.drivebase.TestDrive;
+import frc.team8051.commands.drivebase.PIDDrive;
 import frc.team8051.commands.drivebase.RotateDrivebase;
 import frc.team8051.sensors.DrivebaseEncoder;
 import frc.team8051.sensors.Gyro;
@@ -47,19 +48,25 @@ public class Robot extends TimedRobot {
 
 
     // SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
-
     SmartDashboard.putData("Analog Gyro", gyro);
-
     SmartDashboard.putBoolean("Reset Gyro", false);
+    SmartDashboard.putBoolean("Reset Encoders", false);
+
+    // SmartDashboard.putData("Drivebase Subsystem", differentialDriveBase);
+    SmartDashboard.putData("PIDDrive Command", new PIDDrive());
   }
   
   @Override
   public void robotPeriodic() {
 
-    // using below lines for tuning the pid command rotatedrivebase
+    // using below lines for tuning the pid constants
     if(SmartDashboard.getBoolean("Reset Gyro", false)) {
       gyro.reset();
       SmartDashboard.putBoolean("Reset Gyro", false);
+    }
+    if(SmartDashboard.getBoolean("Reset Encoders", false)) {
+      drivebaseEncoder.zeroEncoder();
+      SmartDashboard.putBoolean("Reset Encoders", false);
     }
 
     SmartDashboard.putNumber("Current Heading", gyro.getHeading());
