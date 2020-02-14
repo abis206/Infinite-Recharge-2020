@@ -19,6 +19,11 @@ import edu.wpi.first.wpilibj.util.Color;
      //private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
     // private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
     // private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
+     private int numberOfTimesSpun = 0;
+     private int numberOfBlues = 0;
+     private int numberOfReds = 0;
+     private int numberOfYellows = 0;
+     private int numberOfGreens = 0;
      @Override
      protected void initDefaultCommand() {
 
@@ -39,12 +44,16 @@ import edu.wpi.first.wpilibj.util.Color;
 
          if (match.color == kBlueTarget) {
              colorString = "Blue";
+             numberOfBlues += 1;
          } else if (match.color == kRedTarget) {
              colorString = "Red";
+             numberOfReds += 1;
          } else if (match.color == kGreenTarget) {
              colorString = "Green";
+             numberOfGreens += 1;
          } else if (match.color == kYellowTarget) {
              colorString = "Yellow";
+             numberOfYellows += 1;
          } else {
              colorString = "Unknown";
          }
@@ -53,6 +62,16 @@ import edu.wpi.first.wpilibj.util.Color;
          SmartDashboard.putNumber("Blue", detectedColor.blue);
          SmartDashboard.putNumber("Confidence", match.confidence);
          SmartDashboard.putString("Detected Color", colorString);
+         SmartDashboard.putNumber("Blues", numberOfBlues);
+         SmartDashboard.putNumber("Reds", numberOfReds);
+         SmartDashboard.putNumber("Greens", numberOfGreens);
+         SmartDashboard.putNumber("Yellows", numberOfYellows);
+         SmartDashboard.putNumber("Spins",numberOfTimesSpun);
+         if(numberOfBlues + numberOfGreens + numberOfReds + numberOfYellows == 9){
+             numberOfTimesSpun += 1;
+
+             System.out.println("Spins: " + numberOfTimesSpun);
+         }
         }
         //Detecting what color the spinner is on
      }
