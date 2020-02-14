@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     oi.initializeBind();
     testDrive = new TestDrive();
-    ColorSensor.colorMatcherrr();
+    colorSensor.colorMatcherrr();
 
     // SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
     SmartDashboard.putData("Analog Gyro", gyro);
@@ -95,6 +95,10 @@ public class Robot extends TimedRobot {
 //                    " encoder right " + drivebaseEncoder.getRightSensorReading());
     Scheduler.getInstance().run();
 //    System.out.println("remove this");
+    if (oi.joystick.getRawButton(1)) {
+                System.out.print("Button Pressed");
+                colorSensor.colorMatcherr();
+            }
   }
 
   @Override
