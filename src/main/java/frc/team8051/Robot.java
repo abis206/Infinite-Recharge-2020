@@ -45,7 +45,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     oi.initializeBind();
     testDrive = new TestDrive();
-    colorSensor.colorMatcherrr();
+    colorSensor.initializeColor();
+    colorSensor.setToZero();
 
     // SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
     SmartDashboard.putData("Analog Gyro", gyro);
