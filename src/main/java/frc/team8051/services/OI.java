@@ -1,62 +1,61 @@
 /*
 Code for controller
  */
+
 package frc.team8051.services;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
-import frc.team8051.commands.drivebase.RotateDrivebase;
-import frc.team8051.constants.RobotMap;
-import frc.team8051.commands.drivebase.RunTankDrive;
-import frc.team8051.commands.drivebase.RunDifferentialDrive;
-import frc.team8051.commands.drivebase.PIDDrive;
 
 public class OI {
-    //declaring button variables 1-8
-    public JoystickButton buttonA, buttonB, buttonX, buttonY, buttonLB, buttonRB, buttonBACK, buttonSTART;
+    private final int DRIVER_JOYSTICK = 0;
+    private final int OPERATOR_JOYSTICK = 1;
+    private final Joystick[] joysticks = new Joystick[2];
 
-    //declaring joystick variable
-    public Joystick joystick;
-    private RotateDrivebase commandX;
-    private RotateDrivebase commandB;
-    private PIDDrive commandY;
+    public class JoystickMap {
+        public static final int BUTTON_A = 1;
+        public static final int BUTTON_B = 2;
+        public static final int BUTTON_X = 3;
+        public static final int BUTTON_Y = 4;
+        public static final int BUTTON_LB = 5;
+        public static final int BUTTON_RB = 6;
+        public static final int BUTTON_BACK = 7;
+        public static final int BUTTON_START = 8;
+    }
 
     public OI() {
-        joystick = new Joystick(0);
-        //setting button variables to numbers on controller
-        buttonA = new JoystickButton(joystick, RobotMap.BUTTON_A);
-        buttonB = new JoystickButton(joystick, RobotMap.BUTTON_B);
-        buttonX = new JoystickButton(joystick, RobotMap.BUTTON_X);
-        buttonY = new JoystickButton(joystick, RobotMap.BUTTON_Y);
-        buttonLB = new JoystickButton(joystick, RobotMap.BUTTON_LB);
-        buttonRB = new JoystickButton(joystick, RobotMap.BUTTON_RB);
-        buttonBACK = new JoystickButton(joystick, RobotMap.BUTTON_BACK);
-        buttonSTART = new JoystickButton(joystick, RobotMap.BUTTON_START);
+        joysticks[DRIVER_JOYSTICK] = new Joystick(DRIVER_JOYSTICK);
+        joysticks[OPERATOR_JOYSTICK] = new Joystick(OPERATOR_JOYSTICK);
     }
 
     public void initializeBind() {
-        //when LB button is held, we can control joysticks/movement of robot
-        System.out.println("binding command to button");
-        this.commandX = new RotateDrivebase(90);
-        this.commandB = new RotateDrivebase(-90);
-        this.commandY = new PIDDrive();
-        buttonX.whenPressed(this.commandX);
-        buttonB.whenPressed(this.commandB);
-        buttonY.whenPressed(this.commandY);
-        SmartDashboard.putData("Button X", this.commandX);
-        SmartDashboard.putData("Button B", this.commandB);
-        SmartDashboard.putData("Button Y", this.commandY);
+
     }
 
-    public double getRightXAxis() { return joystick.getRawAxis(4); }
-    public double getRightYAxis() {
+    public double getRightXAxis(Joystick joystick) { 
+        return joystick.getRawAxis(4); 
+    }
+
+    public double getRightYAxis(Joystick joystick) {
         return joystick.getRawAxis(5);
     }
-    public double getLeftXAxis() {
+    
+    public double getLeftXAxis(Joystick joystick) {
         return joystick.getRawAxis(0);
     }
-    public double getLeftYAxis() {
+
+    public double getLeftYAxis(Joystick joystick) {
         return joystick.getRawAxis(1);
     }
 
+    public JoystickButton getJoystickButton(Joystick joystick, int buttonNumber) {
+        return new JoystickButton(joystick, buttonNumber);
+    }
+
+    public Joystick getOpertorJoystick() {
+        return joysticks[OPERATOR_JOYSTICK];
+    }
+
+    public Joystick getDriverJoystick() {
+        return joysticks[DRIVER_JOYSTICK];
+    }
 }

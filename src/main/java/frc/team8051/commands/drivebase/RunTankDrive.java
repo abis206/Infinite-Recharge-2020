@@ -20,7 +20,7 @@ public class RunTankDrive extends Command {
     }
 
     public void execute() {
-        drivebase.set(oi.getRightYAxis(), oi.getLeftYAxis());
+        // drivebase.set(oi.getRightYAxis(), oi.getLeftYAxis());
         if(drivebase == null) System.out.println("drivebase is null");
         if(oi == null) System.out.println("oi is null");
     }

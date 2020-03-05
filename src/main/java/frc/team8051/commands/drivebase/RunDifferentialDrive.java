@@ -25,8 +25,8 @@ public class RunDifferentialDrive extends Command {
     }
 
     public void execute() {
-        double x = oi.getLeftXAxis();
-        double y = oi.getLeftYAxis();
+        double x = 0;
+        double y = 0;
         double rightPower = y + x;
         double leftPower = y - x;
         drivebase.set(range(rightPower), range(leftPower));

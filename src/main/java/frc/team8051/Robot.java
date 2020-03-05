@@ -6,9 +6,6 @@
 /*----------------------------------------------------------------------------*/
 package frc.team8051;
 
-import frc.team8051.commands.drivebase.TestDrive;
-import frc.team8051.commands.drivebase.PIDDrive;
-import frc.team8051.commands.drivebase.RotateDrivebase;
 import frc.team8051.sensors.DrivebaseEncoder;
 import frc.team8051.sensors.Gyro;
 import frc.team8051.subsystems.DifferentialDriveBase;
@@ -18,18 +15,16 @@ import frc.team8051.services.OI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
   private static Robot robot;
   private Drivebase drivebase;
   private OI oi;
-  private TestDrive testDrive;
   private DifferentialDriveBase differentialDriveBase;
   private DrivebaseEncoder drivebaseEncoder;
   private Gyro gyro;
+  private boolean JoystickUser = false;
 
   Robot() {
     robot = this;
@@ -43,9 +38,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    oi.initializeBind();
-    testDrive = new TestDrive();
-
 
     // SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
     SmartDashboard.putData("Analog Gyro", gyro);
@@ -53,7 +45,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Reset Encoders", false);
 
     // SmartDashboard.putData("Drivebase Subsystem", differentialDriveBase);
-    SmartDashboard.putData("PIDDrive Command", new PIDDrive());
+    // SmartDashboard.putData("PIDDrive Command", new PIDDrive());
   }
   
   @Override
@@ -70,6 +62,7 @@ public class Robot extends TimedRobot {
     }
 
     SmartDashboard.putNumber("Current Heading", gyro.getHeading());
+    Scheduler.getInstance().run();
   }
 
   @Override
@@ -85,15 +78,18 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     System.out.println("Running teleopInit()");
-    // Scheduler.getInstance().add(testDrive);
   }
 
   @Override
   public void teleopPeriodic() {
-//    System.out.println("encoder left " + drivebaseEncoder.getLeftSensorReading() +
-//                    " encoder right " + drivebaseEncoder.getRightSensorReading());
-    Scheduler.getInstance().run();
-//    System.out.println("remove this");
+    if(oi.getOpertorJoystick().getRawButtonPressed(OI.JoystickMap.BUTTON_A)) {
+      JoystickUser = !JoystickUser;
+    }
+
+    double r = JoystickUser? oi.getRightYAxis(oi.getOpertorJoystick()) : oi.getRightYAxis(oi.getDriverJoystick());
+    double l = JoystickUser? oi.getLeftYAxis(oi.getOpertorJoystick()) : oi.getLeftYAxis(oi.getDriverJoystick());
+    differentialDriveBase.getDifferentialDrive().tankDrive(-r * 0.5, -l * 0.5);
+ 
   }
 
   @Override
@@ -104,7 +100,6 @@ public class Robot extends TimedRobot {
   public static Robot getInstance() {
     if(robot == null)
       robot = new Robot();
-
     return robot;
   }
 

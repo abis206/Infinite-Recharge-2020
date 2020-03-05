@@ -11,9 +11,6 @@ public class TestDrive extends Command {
     public TestDrive(OI oi, DifferentialDrive differentialDrive) {
         this.oi = oi;
         this.differentialDrive = differentialDrive;
-//        System.out.println("instantiating <TestDrive>");
-//        System.out.println("<TestDrive> oi " + oi == null);
-//        System.out.println("<TestDrive> differentialDrive " + differentialDrive == null);
     }
 
     public TestDrive() {
@@ -22,19 +19,10 @@ public class TestDrive extends Command {
 
     @Override
     protected void execute() {
-        System.out.println("executing TestDrive");
-        System.out.println("<TestDrive> oi " + oi == null);
-        System.out.println("<TestDrive> differentialDrive " + differentialDrive == null);
-        double leftYAxis = -oi.getLeftYAxis();
-        double rightYAxis = -oi.getRightYAxis();
         double limit = 0.5;
-        double deadZone = 0.04;
-        leftYAxis = Math.abs(leftYAxis) <= deadZone ? 0 : leftYAxis;
-        rightYAxis = Math.abs(rightYAxis) <= deadZone ? 0 : rightYAxis;
-        System.out.println("left y axis: " + leftYAxis + " right y axis: " + rightYAxis);
-        differentialDrive.tankDrive(leftYAxis*limit, rightYAxis*limit);
-
-//        differentialDrive.arcadeDrive(rightYAxis, leftYAxis);
+        double r = -oi.getRightYAxis(oi.getOpertorJoystick());
+        double l = -oi.getLeftYAxis(oi.getOpertorJoystick());
+        differentialDrive.tankDrive(r*limit, l*limit);
     }
 
     @Override
