@@ -19,33 +19,42 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+
+///// Constants for different surface floor
+///// constants from drivebase is commented out
 final class Ceramics {
   final class FeedForwardConstants {
-    public static final double Ks = 0.808;
-    public static final double Kv = 0.952;
-    public static final double Ka = 0.144;
+    public static final double Ks = 0; // 0.808;
+    public static final double Kv = 0; // 0.952;
+    public static final double Ka = 0; // 0.144;
   }
   final class PIDConstants {
-    public static final double Kp = 6.43;
-    public static final double Ki = 0.00;
-    public static final double Kd = 0.00;
+    public static final double Kp = 0; // 6.43;
+    public static final double Ki = 0; // 0.00;
+    public static final double Kd = 0; // 0.00;
   }
 }
 
 final class Carpet {
   final class FeedForwardConstants {
-    public static final double Ks = 0.924;
-    public static final double Kv = 0.961; 
-    public static final double Ka = 0.215;
+    public static final double Ks = 0; // 0.924;
+    public static final double Kv = 0; // 0.961; 
+    public static final double Ka = 0; // 0.215;
   }
   final class PIDConstants {
-    public static final double Kp = 9.38;
-    public static final double Ki = 0.00;
-    public static final double Kd = 0.00;
+    public static final double Kp = 0; // 9.38;
+    public static final double Ki = 0; // 0.00;
+    public static final double Kd = 0; // 0.00;
   }
 }
 
 public class Drivebase extends SubsystemBase {
+    // maths :)
+    private final double WheelDiameter = Units.feetToMeters(6.0/12.0);// wheel diameter is 6 inch
+    private final double PulsePerRevolution = 20.0;
+    private final double GearRatio = 10.75;
+    private final double DistancePerPulse = (WheelDiameter*Math.PI)/PulsePerRevolution/GearRatio;
+
     private final SpeedControllerGroup leftGroup = new SpeedControllerGroup(
         new WPI_VictorSPX(12),
         new WPI_VictorSPX(13)
@@ -82,6 +91,9 @@ public class Drivebase extends SubsystemBase {
     NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("position").getEntry("y");
 
     public Drivebase() {
+        encoderL.setDistancePerPulse(DistancePerPulse);
+        encoderR.setDistancePerPulse(DistancePerPulse);
+
         SmartDashboard.putData("Left PID Controller", leftPIDController);
         SmartDashboard.putData("Right PID Controller", rightPIDController);
     }
@@ -156,7 +168,7 @@ public class Drivebase extends SubsystemBase {
         m_xEntry.setDouble(pose.getTranslation().getX());
         m_yEntry.setDouble(pose.getTranslation().getY());
         // System.out.println(pose);
-        SmartDashboard.putNumber("Gyro_Heading", getRawHeading());
+        // SmartDashboard.putNumber("Gyro_Heading", getRawHeading());
       }
     
 }
