@@ -71,7 +71,9 @@ public class Drivebase extends SubsystemBase {
 
     private final ADIS16448_IMU imu = new ADIS16448_IMU();
 
-    private final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.685);
+    // 0.685 for test drivebase
+    // 0.680 for match drivebase
+    private final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.680);
 
     private Pose2d pose = new Pose2d(0.0, 0.0, getHeading());
 
