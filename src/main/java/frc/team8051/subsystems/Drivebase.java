@@ -1,67 +1,162 @@
 package frc.team8051.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.analog.adis16448.frc.ADIS16448_IMU;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Drivebase extends Subsystem {
-    private final double wheelDiameter = 6.0/12.0; // unit in feet
-    private final double pulsesPerRevo = 20;
-    private final double gearRatio = 10.75;
-    private final double distancePerPulse = (wheelDiameter * Math.PI)/pulsesPerRevo/gearRatio;
+final class Ceramics {
+  final class FeedForwardConstants {
+    public static final double Ks = 0.808;
+    public static final double Kv = 0.952;
+    public static final double Ka = 0.144;
+  }
+  final class PIDConstants {
+    public static final double Kp = 6.43;
+    public static final double Ki = 0.00;
+    public static final double Kd = 0.00;
+  }
+}
 
-    private Encoder rightEncoder;
-    private Encoder leftEncoder;
+final class Carpet {
+  final class FeedForwardConstants {
+    public static final double Ks = 0.924;
+    public static final double Kv = 0.961; 
+    public static final double Ka = 0.215;
+  }
+  final class PIDConstants {
+    public static final double Kp = 9.38;
+    public static final double Ki = 0.00;
+    public static final double Kd = 0.00;
+  }
+}
 
-    private VictorSPX rightMotor;
-    private VictorSPX leftMotor;
+public class Drivebase extends SubsystemBase {
+    private final SpeedControllerGroup leftGroup = new SpeedControllerGroup(
+        new WPI_VictorSPX(12),
+        new WPI_VictorSPX(13)
+    );
 
+    private final SpeedControllerGroup rightGroup = new SpeedControllerGroup(
+        new WPI_VictorSPX(14),
+        new WPI_VictorSPX(15)
+    );
 
+    private final DifferentialDrive differentialDrive = new DifferentialDrive(leftGroup, rightGroup);
+    private final Encoder encoderR = new Encoder(1, 2, false);
+    private final Encoder encoderL = new Encoder(3, 4, false);
+
+    private final ADIS16448_IMU imu = new ADIS16448_IMU();
+
+    private final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.685);
+
+    private Pose2d pose = new Pose2d(0.0, 0.0, getHeading());
+
+    private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(getHeading(), pose);
+  
+    private final SimpleMotorFeedforward feedforward = 
+    new SimpleMotorFeedforward(
+      Carpet.FeedForwardConstants.Ks,
+      Carpet.FeedForwardConstants.Kv,
+      Carpet.FeedForwardConstants.Ka
+    );
+
+    private final PIDController leftPIDController = new PIDController(Carpet.PIDConstants.Kp, 0, 0);
+    private final PIDController rightPIDController = new PIDController(Carpet.PIDConstants.Kp, 0, 0);
+    
+    NetworkTableEntry m_xEntry = NetworkTableInstance.getDefault().getTable("position").getEntry("x");
+    NetworkTableEntry m_yEntry = NetworkTableInstance.getDefault().getTable("position").getEntry("y");
 
     public Drivebase() {
-        rightMotor = new VictorSPX(14);
-        leftMotor = new VictorSPX(15);
-
-        rightEncoder = new Encoder(6, 7);
-        leftEncoder = new Encoder(8, 9);
-
-        rightEncoder.setReverseDirection(true);
-        rightEncoder.setDistancePerPulse(distancePerPulse);
-        leftEncoder.setDistancePerPulse(distancePerPulse);
-
-        zeroEncoder();
+        SmartDashboard.putData("Left PID Controller", leftPIDController);
+        SmartDashboard.putData("Right PID Controller", rightPIDController);
     }
 
-
-    public void set(double right, double left) {
-        setRight(right);
-        setLeft(left);
+    public DifferentialDrive getDifferentialDrive() {
+        return differentialDrive;
     }
 
-    public void setRight(double x) {
-        rightMotor.set(ControlMode.PercentOutput, x);
+    public void zeroHeading() {
+        imu.reset();
     }
 
-    public void setLeft(double x) {
-        leftMotor.set(ControlMode.PercentOutput, -x);
+    public void zeroDistance() {
+        encoderL.reset();
+        encoderR.reset();
     }
 
-    public void zeroEncoder() {
-        rightEncoder.reset();
-        leftEncoder.reset();
+    public Rotation2d getHeading() {
+        return Rotation2d.fromDegrees(Math.IEEEremainder(-imu.getAngle(), 360));
     }
 
-    public Encoder getRightEncoder() {
-        return rightEncoder;
+    public double getRawHeading() {
+        return -imu.getAngle();
     }
 
-    public Encoder getLeftEncoder() {
-        return leftEncoder;
-    }
-
-    @Override
-    protected void initDefaultCommand() {
-
-    }
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+        return new DifferentialDriveWheelSpeeds(
+          encoderL.getRate(), 
+          encoderR.getRate()
+        );
+      }
+    
+      public DifferentialDriveKinematics getKinematics() {
+        return kinematics;
+      }
+    
+      public Pose2d getPose() {
+        return pose;
+      }
+    
+      public SimpleMotorFeedforward getFeedforward() {
+        return feedforward;
+      }
+    
+      public PIDController getLeftPIDController() {
+        return leftPIDController;
+      }
+    
+      public PIDController getRightPIDController() {
+        return rightPIDController;
+      }
+    
+      public void setVolts(double leftVolts, double rightVolts) {
+        leftGroup.setVoltage(leftVolts);
+        rightGroup.setVoltage(-rightVolts);
+        differentialDrive.feed();
+      }
+    
+      public void reset() {
+        zeroDistance();
+        odometry.resetPosition(new Pose2d(), getHeading());
+      }
+    
+      @Override
+      public void periodic() {
+        pose = odometry.update(
+          getHeading(), 
+          encoderL.getDistance(), 
+          encoderR.getDistance()
+        );
+        
+        m_xEntry.setDouble(pose.getTranslation().getX());
+        m_yEntry.setDouble(pose.getTranslation().getY());
+        // System.out.println(pose);
+        SmartDashboard.putNumber("Gyro_Heading", getRawHeading());
+      }
+    
 }
