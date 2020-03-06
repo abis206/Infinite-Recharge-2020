@@ -38,13 +38,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-<<<<<<< HEAD
-=======
-    oi.initializeBind();
-    testDrive = new TestDrive();
-    colorSensor.initializeColor();
-    colorSensor.setToZero();
->>>>>>> 51ed52066497c06d5104713e0e9e046ee73a536a
 
     // SmartDashboard.putData("Rotate Drivebase Command", new RotateDrivebase());
     SmartDashboard.putData("Analog Gyro", gyro);
@@ -69,11 +62,7 @@ public class Robot extends TimedRobot {
     }
 
     SmartDashboard.putNumber("Current Heading", gyro.getHeading());
-<<<<<<< HEAD
     Scheduler.getInstance().run();
-=======
-    colorSensor.colorMatcherr();
->>>>>>> 51ed52066497c06d5104713e0e9e046ee73a536a
   }
 
   @Override
